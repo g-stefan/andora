@@ -1,0 +1,16 @@
+{
+	"solution": {
+		"name" : "andora",
+		"type" : "generic",
+		"projects": [
+			{
+				"name" : "andora",
+				"SPDX-License-Identifier": "Apache-2.0"
+			}
+		],
+		"releaseOutput" : true,
+		"vendor" : {
+			"xyo.web" : "0.34.0"
+		}
+	}
+}
