@@ -1,0 +1,5 @@
+# Deny some files
+<Files "composer.*">
+	Order allow,deny
+	Deny from all
+</Files>

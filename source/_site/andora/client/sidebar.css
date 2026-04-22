@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+/*
+// Andora
+// SPDX-FileCopyrightText: 2026 Grigore Stefan <g_stefan@yahoo.com>
+// SPDX-License-Identifier: CC0-1.0
+*/
+
+
+.sidebar-collapsed {
+    margin-left: -16rem !important;
+}
+
+.sidebar-open {
+    margin-left: 0 !important;
+}
