@@ -6,6 +6,7 @@
 defined("XYO_WEB") or die("Forbidden");
 
 return array(
+    "page.title" => "Instalare",
     "begin" => "Incepe",
     "language.legend" => "Selecteaza limba utilizata pentru instalare",
     "this-will-perform-the-initial-setup" => "Facem setup-ul initial",
@@ -35,5 +36,6 @@ return array(
     "error-the-passwords-must-match" => "Eroare! Parolele trebuie sa fie identice!",
 
     "an-error-occurred" => "A aparut o eroare.",
-    "thank-you" => "Multumesc!"
+    "thank-you" => "Multumesc!",
+    "already-configured" => "Deja configurat!"
 );

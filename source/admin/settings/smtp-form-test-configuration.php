@@ -9,13 +9,13 @@ namespace Andora\Admin\Settings {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/models/setup.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/model/setup.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Models\Setup;
+    use \Andora\Model\Setup;
 
-    class SMTPFormTestConfiguration extends \Andora\Components\Form
+    class SMTPFormTestConfiguration extends \Andora\Component\Form
     {
 
         public function init($options = null)

@@ -9,15 +9,15 @@ namespace Andora\User\Login {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-email.php");
-    require_once("./_site/andora/components/input-password-login.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-email.php");
+    require_once("./_site/andora/component/input-password-login.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Components\InputEmail;
-    use \Andora\Components\InputPasswordLogin;
+    use \Andora\Component\InputEmail;
+    use \Andora\Component\InputPasswordLogin;
 
-    class Form extends \Andora\Components\Form
+    class Form extends \Andora\Component\Form
     {
     
         public function init($options = null)
@@ -29,14 +29,12 @@ namespace Andora\User\Login {
 
             LucideIcons::register($this, "icons");
 
-            InputEMail::register($this, "email", array(
-                "form" => &$this,
+            InputEMail::register($this, "email", array(                
                 "name" => "email",                
                 "placeholder" => "mail@example.com"
             ));
 
-            InputPasswordLogin::register($this, "password", array(
-                "form" => &$this,
+            InputPasswordLogin::register($this, "password", array(                
                 "name" => "password",                
                 "linkForgotPassword"=> $this->site."user/forgot-password"
             ));

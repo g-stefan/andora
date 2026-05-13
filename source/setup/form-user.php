@@ -8,69 +8,57 @@ namespace Andora\Setup {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-name.php");
-    require_once("./_site/andora/components/input-email.php");
-    require_once("./_site/andora/components/input-password.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-name.php");
+    require_once("./_site/andora/component/input-email.php");
+    require_once("./_site/andora/component/input-password.php");
 
-    use \Andora\Components\InputName;
-    use \Andora\Components\InputEmail;
-    use \Andora\Components\InputPassword;
+    use \Andora\Component\InputName;
+    use \Andora\Component\InputEmail;
+    use \Andora\Component\InputPassword;
 
-    class FormUser extends \Andora\Components\Form
+    class FormUser extends \Andora\Component\Form
     {
 
-        public function init($options = null)
+        public function formInit($options = null)
         {
-            parent::init($options);
-
+        
             $this->value->name = null;
             $this->value->email = null;
             $this->value->password = null;
             $this->value->passwordConfirmation = null;
 
-            InputName::register($this, "name", array(
-                "form" => &$this,
+        }
+
+        public function formInitComponents($options = null)
+        {
+            InputName::register($this, "name", array(                
                 "name" => "name",                
                 "required" => true
             ));
 
-            InputEMail::register($this, "email", array(
-                "form" => &$this,
+            InputEMail::register($this, "email", array(                
                 "name" => "email",                
                 "placeholder" => "mail@example.com",
                 "required" => true
             ));
 
-            InputPassword::register($this, "password", array(
-                "form" => &$this,
+            InputPassword::register($this, "password", array(                
                 "name" => "password",                
                 "hasLabel" => true,
                 "required" => true
             ));
 
-            InputPassword::register($this, "passwordConfirmation", array(
-                "form" => &$this,
+            InputPassword::register($this, "passwordConfirmation", array(                
                 "name" => "passwordConfirmation",                
                 "required" => true
             ));
 
         }
 
-        public function process($options = null)
+        public function formProcess($options = null)
         {
-            if ($this->isInit()) {
-                return;
-            }
-
-            if (!$this->isPOST()) {
-                return;
-            }
-
-            if ($this->hasError()) {
-                return;
-            }
-
+        
             if (!(strcmp($this->value->password, $this->value->passwordConfirmation) == 0)) {
                 $this->setElementError("password", true);
                 $this->setElementError("passwordConfirmation", true);
@@ -78,14 +66,9 @@ namespace Andora\Setup {
                 return;
             }
 
-            $this->sessionSet("setup_name", $this->value->name);
-            $this->sessionSet("setup_email", $this->value->email);
-            $this->sessionSet("setup_password", $this->value->password);
-
-            $this->setIsDone(true);
         }
 
-        public function renderAJAX($options = null)
+        public function formRenderAJAX($options = null)
         {
             ?>
 

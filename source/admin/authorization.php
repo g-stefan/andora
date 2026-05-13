@@ -10,9 +10,9 @@ namespace Andora\Admin {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/models/user.php");
+    require_once("./_site/andora/model/user.php");
 
-    use \Andora\Models\User;
+    use \Andora\Model\User;
 
     class Authorization extends \XYO\Web\Authorization
     {
@@ -24,14 +24,12 @@ namespace Andora\Admin {
             $config = \XYO\Web\Config::instance();
 
             $reason = "";
-            $isAuthorized = false;
-            if (property_exists($config, "configured")) {
-                if ($config->configured) {
-                    if (User::checkCurrentSession($reason)) {
-                        $isAuthorized = true;
-                    }
+            $isAuthorized = false;            
+            if ($config->get("configured")) {
+                if (User::checkCurrentSession($reason)) {                    
+                    $isAuthorized = true;
                 }
-            }
+            }            
 
             if (!$isAuthorized) {
                 $this->sessionSet("login_as_admin", true);

@@ -9,20 +9,20 @@ namespace Andora\Admin\Settings {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/message-error.php");
-    require_once("./_site/andora/components/message-ok.php");
-    require_once("./_site/andora/components/ajax-redirect.php");
-    require_once("./_site/andora/models/setup.php");
+    require_once("./_site/andora/component/message-error.php");
+    require_once("./_site/andora/component/message-ok.php");
+    require_once("./_site/andora/component/ajax-redirect.php");
+    require_once("./_site/andora/model/setup.php");
 
     require_once("./admin/settings/smtp-info.php");
     require_once("./admin/settings/smtp-form.php");
     require_once("./admin/settings/smtp-form-test-configuration.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Models\Setup;
-    use \Andora\Components\MessageError;
-    use \Andora\Components\MessageOk;
-    use \Andora\Components\AJAXRedirect;
+    use \Andora\Model\Setup;
+    use \Andora\Component\MessageError;
+    use \Andora\Component\MessageOk;
+    use \Andora\Component\AJAXRedirect;
     use \XYO\Web\Component as NilComponent;
 
     class SMTPConfiguration extends \XYO\Web\Component
@@ -58,7 +58,7 @@ namespace Andora\Admin\Settings {
             AJAXRedirect::registerAndInit($this, $component, array("redirect" => &$this));
             $this->view->renderJS(function () {
                 echo "setTimeout(function(){";
-                $this->componentInfo->renderAJAXRequestGet();
+                $this->componentInfo->renderJSRequestGet();
                 echo "},500);";
             });
         }
@@ -129,13 +129,14 @@ namespace Andora\Admin\Settings {
                     }
 
                     $config = \XYO\Web\Config::instance();
+                    $configSMTP = $config->get("smtp");
                     if (
                         !Setup::writeSMTPConfigFile(
-                            $config->smtp->name,
-                            $config->smtp->username,
-                            $config->smtp->password,
-                            $config->smtp->server,
-                            $config->smtp->port,
+                            $configSMTP->get("name"),
+                            $configSMTP->get("username"),
+                            $configSMTP->get("password"),
+                            $configSMTP->get("server"),
+                            $configSMTP->get("port"),
                             true,
                             $reason
                         )

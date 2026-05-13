@@ -9,15 +9,15 @@ namespace Andora\Admin\Settings {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-text.php");
-    require_once("./_site/andora/components/input-password-text.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-text.php");
+    require_once("./_site/andora/component/input-password-text.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Components\InputText;
-    use \Andora\Components\InputPasswordText;
+    use \Andora\Component\InputText;
+    use \Andora\Component\InputPasswordText;
 
-    class SMTPForm extends \Andora\Components\Form
+    class SMTPForm extends \Andora\Component\Form
     {
 
         public function init($options = null)
@@ -35,24 +35,23 @@ namespace Andora\Admin\Settings {
             $username = "";
             $port = "465";
             $config = \XYO\Web\Config::instance();
-            if (property_exists($config, "smtp")) {
-                $name = $config->smtp->name;
-                $server = $config->smtp->server;
-                $username = $config->smtp->username;
-                $port = $config->smtp->port;                
+            if ($config->has("smtp")) {
+                $configSMTP = $config->get("smtp");
+                $name = $configSMTP->get("name");
+                $server = $configSMTP->get("server");
+                $username = $configSMTP->get("username");
+                $port = $configSMTP->get("port");
             }
 
             LucideIcons::register($this, "icons");
 
             InputText::register($this, "name", array(
-                "form" => &$this,
                 "name" => "name",
                 "required" => true,
                 "initialValue" => $name
             ));
 
             InputText::register($this, "username", array(
-                "form" => &$this,
                 "name" => "username",
                 "required" => true,
                 "autocomplete" => "off",
@@ -60,21 +59,18 @@ namespace Andora\Admin\Settings {
             ));
 
             InputPasswordText::registerAndInit($this, "password", array(
-                "form" => &$this,
                 "name" => "password",
                 "required" => true,
                 "autocomplete" => "new-password"
             ));
 
             InputText::register($this, "server", array(
-                "form" => &$this,
                 "name" => "server",
                 "required" => true,
                 "initialValue" => $server
             ));
 
             InputText::register($this, "port", array(
-                "form" => &$this,
                 "name" => "port",
                 "required" => true,
                 "initialValue" => $port

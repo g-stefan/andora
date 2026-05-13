@@ -6,6 +6,7 @@
 defined("XYO_WEB") or die("Forbidden");
 
 return array(
+    "page.title" => "Setup",
     "begin" => "Begin",
     "language.legend" => "Select the language to use during installation",
     "this-will-perform-the-initial-setup" => "This will perform the initial setup",
@@ -35,5 +36,6 @@ return array(
     "error-the-passwords-must-match" => "Error! The passwords must match!",
 
     "an-error-occurred" => "An error occurred.",
-    "thank-you" => "Thank you!"
+    "thank-you" => "Thank you!",
+    "already-configured" => "Already configured!"
 );

@@ -8,51 +8,56 @@ namespace Andora\Setup {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-select.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-select.php");
 
-    use \Andora\Components\InputSelect;
-    class FormSelectLanguage extends \Andora\Components\Form
+    use \Andora\Component\InputSelect;
+    class FormSelectLanguage extends \Andora\Component\Form
     {
+        public $onSelect_ = null;
 
-        public function init($options = null)
+        public function formInit($options = null)
         {
-            parent::init($options);
+            $this->value->language = "en-US";
+        }
 
-            $this->value->language = null;
-
-            InputSelect::register($this, "language", array(
-                "form" => &$this,
-                "name" => "language",                
+        public function formInitComponents($options = null)
+        {
+            InputSelect::register($this, "language", array(                
+                "name" => "language",
                 "required" => true,
                 "list" => array(
                     "en-US" => "English (United States)",
                     "ro-RO" => "Romana"
                 ),
-                "initialValue" => $this->sessionGet("setup_language", "en-US")
+                "initialValue" => $this->value->language
             ));
         }
 
-        public function process($options = null)
+        public function setOnSelect($fn)
         {
-            if ($this->isInit()) {
-                return;
-            }
-            if (!$this->isPOST()) {
-                return;
-            }
-            if ($this->hasError()) {
-                return;
-            }
-
-            $this->sessionSet("setup_language", $this->value->language);
-            $this->setLanguage($this->value->language);
-            $this->loadLanguage(true);
-            
-            $this->setIsDone($this->getElementValueString("action") == "submit");
+            $this->onSelect_ = $fn;
         }
 
-        public function renderAJAX($options = null)
+        public function onSelect()
+        {
+            if (!is_null($this->onSelect_)) {
+                ($this->onSelect_)($this);
+            }
+        }
+
+        public function formProcess($options = null)
+        {
+            $action = $this->getElementValueString("action");
+            if ($action == "select") {
+                $this->onSelect();
+            }
+            if ($action == "submit") {
+                $this->setIsDone($this->getElementValueString("action") == "submit");
+            }
+        }
+
+        public function formRenderAJAX($options = null)
         {
             ?>
 
@@ -80,12 +85,12 @@ namespace Andora\Setup {
                 $this->view->renderJS(function () use (&$payload, &$payloadJs) {
                     echo "document.getElementById(\"" . $this->getComponentId("language") . "\").addEventListener(\"change\",function(e){";
                     echo "e.preventDefault();";
-                    $this->renderAJAXRequestPostForm();
+                    $this->renderJSRequestPostForm();
                     echo "});";
                     echo "document.getElementById(\"" . $this->getElementId("submit") . "\").addEventListener(\"click\",function(e){";
                     echo "e.preventDefault();";
                     echo "document.getElementById(\"" . $this->getElementId("action") . "\").value=\"submit\";";
-                    $this->renderAJAXRequestPostForm();
+                    $this->renderJSRequestPostForm();
                     echo "});";
                 });
 

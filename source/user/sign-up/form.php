@@ -9,17 +9,17 @@ namespace Andora\User\SignUp {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-name.php");
-    require_once("./_site/andora/components/input-email.php");
-    require_once("./_site/andora/components/input-password.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-name.php");
+    require_once("./_site/andora/component/input-email.php");
+    require_once("./_site/andora/component/input-password.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Components\InputName;
-    use \Andora\Components\InputEmail;
-    use \Andora\Components\InputPassword;
+    use \Andora\Component\InputName;
+    use \Andora\Component\InputEmail;
+    use \Andora\Component\InputPassword;
 
-    class Form extends \Andora\Components\Form
+    class Form extends \Andora\Component\Form
     {
 
         public function init($options = null)
@@ -34,28 +34,24 @@ namespace Andora\User\SignUp {
 
             LucideIcons::register($this, "icons");
             
-            InputName::register($this, "name", array(
-                "form" => &$this,
+            InputName::register($this, "name", array(                
                 "name" => "name",
                 "required" => true
             ));
 
-            InputEMail::register($this, "email", array(
-                "form" => &$this,
+            InputEMail::register($this, "email", array(                
                 "name" => "email",
                 "placeholder" => "mail@example.com",
                 "required" => true
             ));
 
-            InputPassword::register($this, "password", array(
-                "form" => &$this,
+            InputPassword::register($this, "password", array(                
                 "name" => "password",
                 "hasLabel" => true,
                 "required" => true
             ));
 
-            InputPassword::register($this, "passwordConfirmation", array(
-                "form" => &$this,
+            InputPassword::register($this, "passwordConfirmation", array(                
                 "name" => "passwordConfirmation",
                 "required" => true
             ));

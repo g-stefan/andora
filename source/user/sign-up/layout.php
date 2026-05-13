@@ -6,6 +6,6 @@
 defined("XYO_WEB") or die("Forbidden");
 
 require_once("./_site/xyo/web/web.php");
-require_once("./_site/andora/layouts/setup.php");
+require_once("./_site/andora/layout/setup.php");
 
 return \Andora\Layouts\Setup::class;

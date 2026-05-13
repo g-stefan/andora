@@ -11,19 +11,19 @@ namespace Andora\Admin {
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
     require_once("./_site/xyo/inter-font/inter-font.php");
     require_once("./_site/andora/client.php");
-    require_once("./_site/andora/components/theme-change.php");
-    require_once("./_site/andora/components/logo-andora.php");
-    require_once("./_site/andora/components/sidebar.php");
-    require_once("./_site/andora/models/dashboard.php");
+    require_once("./_site/andora/component/theme-change.php");
+    require_once("./_site/andora/component/logo-andora.php");
+    require_once("./_site/andora/component/sidebar.php");
+    require_once("./_site/andora/model/dashboard.php");
 
     use \Andora\Client;
     use \XYO\OverlayScrollbars;
     use \XYO\LucideIcons;
     use \XYO\InterFont;
-    use \Andora\Components\ThemeChange;
-    use \Andora\Components\LogoAndora;
-    use \Andora\Components\Sidebar;
-    use \Andora\Models\Dashboard;
+    use \Andora\Component\ThemeChange;
+    use \Andora\Component\LogoAndora;
+    use \Andora\Component\Sidebar;
+    use \Andora\Model\Dashboard;
 
     class Layout extends \XYO\Web\Layout
     {

@@ -8,19 +8,19 @@ namespace Andora\Admin\Settings {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/models/dashboard.php");
-    require_once("./_site/andora/components/message-error.php");
-    require_once("./_site/andora/components/message-ok.php");
-    require_once("./_site/andora/components/data-table.php");
-    require_once("./_site/andora/models/setup.php");
+    require_once("./_site/andora/model/dashboard.php");
+    require_once("./_site/andora/component/message-error.php");
+    require_once("./_site/andora/component/message-ok.php");
+    require_once("./_site/andora/component/data-table.php");
+    require_once("./_site/andora/model/setup.php");
 
     require_once("./admin/settings/smtp-configuration.php");
 
-    use \Andora\Models\Setup;
-    use \Andora\Models\Dashboard;
-    use \Andora\Components\MessageError;
-    use \Andora\Components\MessageOk;
-    use \Andora\Components\DataTable;
+    use \Andora\Model\Setup;
+    use \Andora\Model\Dashboard;
+    use \Andora\Component\MessageError;
+    use \Andora\Component\MessageOk;
+    use \Andora\Component\DataTable;
 
     class Page extends \XYO\Web\Page
     {

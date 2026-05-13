@@ -38,7 +38,7 @@ namespace Andora\Admin\Settings {
                 $message = "smtp.info.configured";
                 $icon = "triangle-alert";
                 $iconClass = "text-warning";
-                if ($config->smtp->isTested) {
+                if ($config->get("smtp")->get("isTested")) {
                     $message = "smtp.info.configured-and-tested";
                     $icon = "circle-check-big";
                     $iconClass = "text-success";
@@ -59,7 +59,7 @@ namespace Andora\Admin\Settings {
                     <script>
                         document.getElementById("<?php echo $this->id; ?>").addEventListener("click", function (e) {
                             e.preventDefault();
-                            document.getElementById("<?php echo $this->toggleId; ?>").checked=true;
+                            document.getElementById("<?php echo $this->toggleId; ?>").checked = true;
                         });
                     </script>
                 <?php });

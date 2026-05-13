@@ -9,40 +9,38 @@ namespace Andora\Setup {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/theme-change.php");
-    require_once("./_site/andora/components/logo-andora.php");
-    require_once("./_site/andora/components/message-error.php");
-    require_once("./_site/andora/components/message-ok.php");
-    require_once("./_site/andora/models/setup.php");
-    require_once("./_site/andora/models/user.php");
+    require_once("./_site/andora/component/theme-change.php");
+    require_once("./_site/andora/component/logo-andora.php");
+    require_once("./_site/andora/component/message-error.php");
+    require_once("./_site/andora/component/message-ok.php");
+    require_once("./_site/andora/component/container.php");
+    require_once("./_site/andora/component/placeholder.php");
+    require_once("./_site/andora/model/setup.php");
+    require_once("./_site/andora/model/user.php");
 
     require_once("./setup/form-select-language.php");
     require_once("./setup/form-select-database.php");
     require_once("./setup/form-user.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Components\ThemeChange;
-    use \Andora\Components\LogoAndora;
-    use \Andora\Components\MessageError;
-    use \Andora\Components\MessageOk;
-    use \Andora\Models\Setup;
-    use \Andora\Models\User;
+    use \Andora\Component\ThemeChange;
+    use \Andora\Component\LogoAndora;
+    use \Andora\Component\MessageError;
+    use \Andora\Component\MessageOk;
+    use \Andora\Component\Container;
+    use \Andora\Component\Placeholder;
+    use \Andora\Model\Setup;
+    use \Andora\Model\User;
 
     class Page extends \XYO\Web\Page
     {
-        protected $form = null;
-        protected $step = null;
-        protected $init = null;
-        protected $reason = null;
+        protected $comContainer = null;
 
         public function init($options = null)
         {
-            $this->step = $this->sessionGet("setup_step", "select-language");
-            $this->init = false;
-
             // ---
 
-            $language = $this->sessionGet("setup_language", "en-US");
+            $language = $this->getState("lang", "en-US");
             $this->setLanguage($language);
             $this->loadLanguage(true);
 
@@ -53,134 +51,185 @@ namespace Andora\Setup {
             ThemeChange::register($this, "theme-change");
             LogoAndora::register($this, "logo-andora");
 
-        }
+            $component = "select-language";
+            $config = \XYO\Web\Config::instance();
+            if ($config->get("configured", false)) {
+                $isMessage = false;
+                if ($this->isAjax()) {                    
+                    if ($this->request->get("component", "") == "message-ok") {
+                        $isMessage = true;
+                    }
+                }
+                if (!$isMessage) {
+                    $component = "message-ok";
+                    $this->request->set("message", "already-configured");
+                }
+            }
 
-        public function setStep($step)
-        {
-            $this->step = $step;
-            $this->sessionSet("setup_step", $step);
-            $this->init = true;
-            $this->setFormComponent();
-        }
+            $this->comContainer = Container::register($this, "container", array(
+                "ajax-component" => true,
+                "component" => $component,
+                "class" => "w-full flex items-start justify-center"
+            ));
 
-        public function setFormComponent()
-        {
-            if ($this->step == "select-language") {
-                $this->form = FormSelectLanguage::registerAndInit($this, "form", array("init" => $this->init));
-            }
-            if ($this->step == "select-database") {
-                $this->form = FormSelectDatabase::registerAndInit($this, "form", array("init" => $this->init));
-            }
-            if ($this->step == "user") {
-                $this->form = FormUser::registerAndInit($this, "form", array("init" => $this->init));
-            }
-            if ($this->step == "ok") {
-                $this->form = MessageOk::registerAndInit($this, "form", array(
-                    "title" => "Setup",
-                    "message" => $this->language->get("thank-you")
+            $this->comContainer->setAJAXComponent("select-language", function ($parent, $component) {
+                $form = FormSelectLanguage::registerAndInit($parent, $component);
+                $form->setOnInit([$this, "onSelectLanguageInit"]);
+                $form->setOnSelect([$this, "onSelectLanguage"]);
+                $form->setOnSuccess([$this, "onSetLanguage"]);
+            });
+
+            $this->comContainer->setAJAXComponent("select-database", function ($parent, $component) {
+                $form = FormSelectDatabase::registerAndInit($parent, $component);
+                $form->setOnSuccess([$this, "onSelectDatabase"]);
+            });
+
+            $this->comContainer->setAJAXComponent("register-user", function ($parent, $component) {
+                $form = FormUser::registerAndInit($parent, $component);
+                $form->setOnSuccess([$this, "onRegisterUser"]);
+            });
+
+            $this->comContainer->setAJAXComponent("message-ok", function ($parent, $component) {
+                $message = $this->request->get("message", "");
+                MessageOk::register($parent, $component, array(
+                    "title" => $this->language->get("page.title"),
+                    "message" => $this->language->get($message)
                 ));
-            }
-            if ($this->step == "error") {
-                $this->form = MessageError::registerAndInit($this, "form", array(
+            });
+
+            $this->comContainer->setAJAXComponent("message-error", function ($parent, $component) {
+                $reason = $this->request->get("reason", "");
+                MessageError::register($parent, $component, array(
                     "title" => "Setup",
                     "message" => $this->language->get("an-error-occurred"),
-                    "reason" => $this->reason
+                    "reason" => $reason
                 ));
-            }
+            });
         }
 
-        public function process($options = null)
+        public function messageError($form, $reason)
         {
+            $form->setIsDone(false);
+            $form->disableRenderAJAX(true);
+            $this->view->renderJS(function () use ($reason) {
+                $this->comContainer->renderJSRequestGet(array("component" => "message-error", "reason" => $reason));
+            });
+        }
 
-            if (!$this->isPOST()) {
-                $this->setStep("select-language");
-                return;
-            }
-
-            $this->setFormComponent();
-
-            if (!$this->form->isDone()) {
-                return;
-            }
-
-            if ($this->step == "select-language") {
-                if (
-                    !Setup::writeLanguageConfigFile(
-                        $this->sessionGet("setup_language"),
-                        $this->reason
-                    )
-                ) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                $this->setStep("select-database");
-                return;
-            }
-
-            if ($this->step == "select-database") {
-
-                if (
-                    !Setup::writeDatabaseConfigFile(
-                        $this->sessionGet("setup_databaseType"),
-                        $this->sessionGet("setup_username"),
-                        $this->sessionGet("setup_password"),
-                        $this->sessionGet("setup_databaseServer"),
-                        $this->sessionGet("setup_databasePort"),
-                        $this->sessionGet("setup_databaseName"),
-                        $this->sessionGet("setup_tablePrefix"),
-                        $this->reason
-                    )
-                ) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                if (!Setup::checkDatabaseConnection($this->reason)) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                if (!Setup::dsCreateStorage($this->reason)) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                if (!Setup::writeUserConfigFile($this->reason)) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                if (!Setup::writeConfiguredConfigFile($this->reason)) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                $this->setStep("user");
-                return;
-            }
-
-            if ($this->step == "user") {
-                if (
-                    !User::addUser(
-                        $this->sessionGet("setup_name"),
-                        $this->sessionGet("setup_email"),
-                        $this->sessionGet("setup_password"),
-                        $this->reason
-                    )
-                ) {
-                    $this->setStep("error");
-                    return;
-                }
-
-                $this->setStep("ok");
-                return;
-            }
+        public function messageOk($form, $message)
+        {
+            $form->setIsDone(false);
+            $form->disableRenderAJAX(true);
+            $this->view->renderJS(function () use ($message) {
+                $this->comContainer->renderJSRequestGet(array("component" => "message-ok", "message" => $message));
+            });
         }
 
         public function render($options = null)
         {
-            $this->renderComponent("form");
+            $this->renderComponent("container");
+        }
+
+        public function onSelectLanguageInit(&$form)
+        {
+            $form->value->language = $this->getState("lang", "en-US");
+        }
+
+        public function onSelectLanguage(&$form)
+        {
+            $form->setIsDone(false);
+            $form->disableRenderAJAX(true);
+            // ---
+            $this->setState("lang", $form->value->language);
+            $this->view->renderJS(function () {
+                $this->comContainer->renderJSRequestGet(array("component" => "select-language"));
+            });
+        }
+
+        public function onSetLanguage(&$form)
+        {
+            $form->disableRenderAJAX(true);
+            // ---
+            $reason = null;
+            $isOk = Setup::writeLanguageConfigFile(
+                $this->getState("lang", "en-US"),
+                $reason
+            );
+
+            if (!$isOk) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            $this->view->renderJS(function () {
+                $this->comContainer->renderJSRequestGet(array("component" => "select-database"));
+            });
+        }
+
+        public function onSelectDatabase(&$form)
+        {
+            $form->disableRenderAJAX(true);
+            // ---
+            $reason = null;
+            $isOk = Setup::writeDatabaseConfigFile(
+                $form->value->databaseType,
+                $form->value->username,
+                $form->value->password,
+                $form->value->databaseServer,
+                $form->value->databasePort,
+                $form->value->databaseName,
+                $form->value->tablePrefix,
+                $reason
+            );
+
+            if (!$isOk) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            if (!Setup::checkDatabaseConnection($reason)) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            if (!Setup::dsCreateStorage($reason)) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            if (!Setup::writeUserConfigFile($reason)) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            if (!Setup::writeConfiguredConfigFile($reason)) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            $this->view->renderJS(function () {
+                $this->comContainer->renderJSRequestGet(array("component" => "register-user"));
+            });
+        }
+
+        public function onRegisterUser(&$form)
+        {
+            $form->disableRenderAJAX(true);
+            // ---
+            $reason = null;
+            $isOk = User::addUser(
+                $form->value->name,
+                $form->value->email,
+                $form->value->password,
+                $reason
+            );
+
+            if (!$isOk) {
+                $this->messageError($form, $reason);
+                return;
+            }
+
+            $this->messageOk($form, "thank-you");
         }
 
     }

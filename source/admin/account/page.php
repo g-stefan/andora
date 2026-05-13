@@ -8,9 +8,9 @@ namespace Andora\Admin\Setup {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/components/data-table.php");
+    require_once("./_site/andora/component/data-table.php");
 
-    use \Andora\Components\DataTable;
+    use \Andora\Component\DataTable;
 
     class Page extends \XYO\Web\Page
     {

@@ -9,13 +9,13 @@ namespace Andora\Admin\SignUp {
 
     require_once("./_site/xyo/web/web.php");
     require_once("./_site/xyo/lucide-icons/lucide-icons.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-password.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-password.php");
 
     use \XYO\LucideIcons;
-    use \Andora\Components\InputPassword;
+    use \Andora\Component\InputPassword;
 
-    class Form extends \Andora\Components\Form
+    class Form extends \Andora\Component\Form
     {
         public function init($options = null)
         {
@@ -26,16 +26,14 @@ namespace Andora\Admin\SignUp {
 
             LucideIcons::register($this, "icons");
 
-            InputPassword::register($this, "password", array(
-                "form" => &$this,
+            InputPassword::register($this, "password", array(                
                 "name" => "password",
                 "legend" => "Password",
                 "placeholder" => "password",
                 "hasLabel" => true
             ));
 
-            InputPassword::register($this, "passwordConfirmation", array(
-                "form" => &$this,
+            InputPassword::register($this, "passwordConfirmation", array(                
                 "name" => "passwordConfirmation",
                 "legend" => "Confirm Password",
                 "placeholder" => "password"

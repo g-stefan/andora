@@ -8,21 +8,20 @@ namespace Andora\Setup {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/components/form.php");
-    require_once("./_site/andora/components/input-select.php");
-    require_once("./_site/andora/components/input-text.php");
-    require_once("./_site/andora/components/input-password-text.php");
+    require_once("./_site/andora/component/form.php");
+    require_once("./_site/andora/component/input-select.php");
+    require_once("./_site/andora/component/input-text.php");
+    require_once("./_site/andora/component/input-password-text.php");
 
-    use \Andora\Components\InputSelect;
-    use \Andora\Components\InputText;
-    use \Andora\Components\InputPasswordText;
+    use \Andora\Component\InputSelect;
+    use \Andora\Component\InputText;
+    use \Andora\Component\InputPasswordText;
 
-    class FormSelectDatabase extends \Andora\Components\Form
+    class FormSelectDatabase extends \Andora\Component\Form
     {
 
-        public function init($options = null)
+        public function formInit($options = null)
         {
-            parent::init($options);
 
             $this->value->databaseType = null;
             $this->value->databaseName = null;
@@ -32,8 +31,17 @@ namespace Andora\Setup {
             $this->value->databasePort = null;
             $this->value->tablePrefix = null;
 
+        }
+
+        public function formInitComponents($options = null)
+        {
+            $this->value->databaseType = "mysql";
+            if ($this->isPOST()) {
+                $this->setIsInit($this->getElementValueString("action") != "submit");
+                $this->value->databaseType = $this->getElementValueString("databaseType", $this->value->databaseType);
+            }
+
             InputSelect::register($this, "databaseType", array(
-                "form" => &$this,
                 "name" => "databaseType",
                 "required" => true,
                 "list" => array(
@@ -41,98 +49,60 @@ namespace Andora\Setup {
                     "postgresql" => "PostgreSQL",
                     "sqlite" => "SQLite",
                 ),
-                "initialValue" => $this->sessionGet("setup_databaseType", "mysql")
+                "initialValue" => $this->value->databaseType
             ));
-
-        }
-
-        public function process($options = null)
-        {
-            if (!$this->isInit()) {
-                $action = $this->getElementValueString("action", "select");
-                if ($action == "select") {
-                    $this->setIsInit(true);
-                }
-            }
 
             if ($this->value->databaseType == "mysql" || $this->value->databaseType == "postgresql") {
                 $defaultPort = 3306;
                 if ($this->value->databaseType == "postgresql") {
                     $defaultPort = 5432;
                 }
+                if ($this->value->databasePort == 0) {
+                    $this->value->databasePort = $defaultPort;
+                }
 
-                InputText::registerAndInit($this, "databaseName", array(
-                    "form" => &$this,
+                InputText::register($this, "databaseName", array(
                     "name" => "databaseName",
                     "placeholder" => "andora",
-                    "required" => true,
-                    "initialValue" => $this->sessionGet("setup_databaseName", "")
+                    "required" => true
                 ));
 
-                InputText::registerAndInit($this, "username", array(
-                    "form" => &$this,
+                InputText::register($this, "username", array(
                     "name" => "username",
                     "required" => true,
-                    "initialValue" => $this->sessionGet("setup_username", ""),
                     "autocomplete" => "off"
                 ));
 
-                InputPasswordText::registerAndInit($this, "password", array(
-                    "form" => &$this,
+                InputPasswordText::register($this, "password", array(
                     "name" => "password",
-                    "initialValue" => $this->sessionGet("setup_password", ""),
                     "autocomplete" => "new-password"
                 ));
 
-                InputText::registerAndInit($this, "databaseServer", array(
-                    "form" => &$this,
+                InputText::register($this, "databaseServer", array(
                     "name" => "databaseServer",
-                    "required" => true,
-                    "initialValue" => $this->sessionGet("setup_databaseServer", "localhost")
+                    "required" => true
                 ));
 
-                InputText::registerAndInit($this, "databasePort", array(
-                    "form" => &$this,
+                InputText::register($this, "databasePort", array(
                     "name" => "databasePort",
                     "required" => true,
-                    "initialValue" => $this->sessionGet("setup_databasePort", $defaultPort)
+                    "initialValue" => $defaultPort
                 ));
 
-                InputText::registerAndInit($this, "tablePrefix", array(
-                    "form" => &$this,
+                InputText::register($this, "tablePrefix", array(
                     "name" => "tablePrefix",
-                    "placeholder" => "",
-                    "initialValue" => $this->sessionGet("setup_tablePrefix", "")
+                    "placeholder" => ""
                 ));
-
             }
 
-            if ($this->isInit()) {
-                return;
-            }
+        }
 
-            if (!$this->isPOST()) {
-                return;
-            }
-
-            if ($this->hasError()) {
-                return;
-            }
-
-            $this->sessionSet("setup_databaseType", $this->value->databaseType);
-            if ($this->value->databaseType == "mysql" || $this->value->databaseType == "postgresql") {
-                $this->sessionSet("setup_databaseName", $this->value->databaseName);
-                $this->sessionSet("setup_username", $this->value->username);
-                $this->sessionSet("setup_password", $this->value->password);
-                $this->sessionSet("setup_databaseServer", $this->value->databaseServer);
-                $this->sessionSet("setup_databasePort", $this->value->databasePort);
-                $this->sessionSet("setup_tablePrefix", $this->value->tablePrefix);
-            }
-
+        public function formProcess($options = null)
+        {
             $this->setIsDone($this->getElementValueString("action") == "submit");
         }
 
-        public function renderAJAX($options = null)
+        public function formRenderAJAX($options = null)
         {
             ?>
 
@@ -176,12 +146,12 @@ namespace Andora\Setup {
                 $this->view->renderJS(function () {
                     echo "document.getElementById(\"" . $this->getComponentId("databaseType") . "\").addEventListener(\"change\",function(e){";
                     echo "e.preventDefault();";
-                    $this->renderAJAXRequestPostForm();
+                    $this->renderJSRequestPostForm();
                     echo "});";
                     echo "document.getElementById(\"" . $this->getElementId("submit") . "\").addEventListener(\"click\",function(e){";
                     echo "e.preventDefault();";
                     echo "document.getElementById(\"" . $this->getElementId("action") . "\").value=\"submit\";";
-                    $this->renderAJAXRequestPostForm();
+                    $this->renderJSRequestPostForm();
                     echo "});";
                 });
 

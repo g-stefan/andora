@@ -8,13 +8,13 @@ namespace Andora\Admin\Logout {
     defined("XYO_WEB") or die("Forbidden");
 
     require_once("./_site/xyo/web/web.php");
-    require_once("./_site/andora/components/message-error.php");
-    require_once("./_site/andora/components/message-ok.php");
-    require_once("./_site/andora/models/user.php");
+    require_once("./_site/andora/component/message-error.php");
+    require_once("./_site/andora/component/message-ok.php");
+    require_once("./_site/andora/model/user.php");
 
-    use \Andora\Components\MessageError;
-    use \Andora\Components\MessageOk;
-    use \Andora\Models\User;
+    use \Andora\Component\MessageError;
+    use \Andora\Component\MessageOk;
+    use \Andora\Model\User;
 
     class Page extends \XYO\Web\Page
     {
